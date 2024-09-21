@@ -15,17 +15,18 @@ namespace Snake2
         {
             wallList = new List<Figure>();
 
-            //отрисовка рамочки
-            HorizontalLine upLine = new HorizontalLine(0, mapWidth - 2, 0, '+');
-            HorizontalLine downLine = new HorizontalLine(0, mapWidth - 2, mapHeight - 1, '+');
+            // Отрисовка рамочки
+            HorizontalLine upLine = new HorizontalLine(0, mapWidth - 1, 0, '+');
+            HorizontalLine downLine = new HorizontalLine(0, mapWidth - 1, mapHeight - 1, '+');
             verticalLine leftLine = new verticalLine(0, mapHeight - 1, 0, '+');
-            verticalLine rightLine = new verticalLine(0, mapHeight - 1, mapWidth - 2, '+');
+            verticalLine rightLine = new verticalLine(0, mapHeight - 1, mapWidth - 1, '+');
 
             wallList.Add(upLine);
             wallList.Add(downLine);
             wallList.Add(leftLine);
             wallList.Add(rightLine);
         }
+
         internal bool IsHit(Figure figure)
         {
             foreach (var wall in wallList)
@@ -37,6 +38,7 @@ namespace Snake2
             }
             return false;
         }
+
         internal void Draw()
         {
             foreach (var wall in wallList)
@@ -44,7 +46,5 @@ namespace Snake2
                 wall.Draw();
             }
         }
-
-
     }
 }

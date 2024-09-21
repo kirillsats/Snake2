@@ -1,13 +1,9 @@
 ﻿using Snake2;
 using System;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace Snake2
 {
@@ -15,66 +11,76 @@ namespace Snake2
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Tere tulemast Snake mängu!");
+            Console.WriteLine("Vali tase: ");
+            Console.WriteLine("1. Tase 1");
+            Console.WriteLine("2. Tase 2");
+            Console.WriteLine("3. Tase 3");
 
-            try
+            string userInput = Console.ReadLine();
+            string playerName;
+
+            // Запрос имени игрока после выбора уровня
+            Console.WriteLine("Sisestage oma nimi: ");
+            playerName = Console.ReadLine();
+
+            Time gameTimer = new Time(@"..\..\GameRecord.txt");
+            gameTimer.Start(); // Запускаем таймер
+            Thread displayThread = new Thread(gameTimer.DisplayTime);
+            displayThread.Start();
+
+            Walls walls;
+            Snake snake;
+            FoodCreator foodCreator;
+            Point food;
+
+            switch (userInput)
             {
-                // Открываем файл для записи (append = true)
-                StreamWriter sw = new StreamWriter(@"..\..\RecordTable.txt", true);
-                Console.WriteLine("Sisestage oma nimi: ");
-                string nimi = Console.ReadLine();
-                sw.WriteLine(nimi); // Записываем имя в файл           
-                sw.Close();
-                Console.Clear();
+                case "2":
+                    Console.Clear();
+                    Console.WriteLine("Sa valisid tase 2");
+                    walls = new Walls(80, 25);
+                    walls.Draw();
+                    Point p1 = new Point(4, 5, '*');
+                    snake = new Snake(p1, 4, Direction.RIGHT);
+                    snake.Draw();
+                    foodCreator = new FoodCreator(80, 25, '$');
+                    food = foodCreator.CreateFood();
+                    food.Draw();
+                    break;
+
+                case "3":
+                    Console.Clear();
+                    Console.WriteLine("Sa valisid tase 3");
+                    walls = new Walls(60, 20);
+                    walls.Draw();
+                    Point p2 = new Point(4, 5, '*');
+                    snake = new Snake(p2, 4, Direction.RIGHT);
+                    snake.Draw();
+                    foodCreator = new FoodCreator(60, 20, '$');
+                    food = foodCreator.CreateFood();
+                    food.Draw();
+                    break;
+
+                case "1":
+                    Console.Clear();
+                    Console.WriteLine("Sa valisid tase 1");
+                    walls = new Walls(100, 30); // Например, для уровня 1
+                    walls.Draw();
+                    Point p3 = new Point(4, 5, '*');
+                    snake = new Snake(p3, 4, Direction.RIGHT);
+                    snake.Draw();
+                    foodCreator = new FoodCreator(100, 30, '$');
+                    food = foodCreator.CreateFood();
+                    food.Draw();
+                    break;
+
+                default:
+                    Console.WriteLine("Vale valik (Неправильный выбор). Proovi uuesti.");
+                    return; // Выход, если выбор некорректный
             }
-            catch
-            {
-                Console.WriteLine("Tekkis viga.");
-            }
-            
 
-            try
-            {
-                // Открываем файл для чтения
-                StreamReader sr = new StreamReader(@"..\..\RecordTable.txt");
-                string lines = sr.ReadToEnd();
-                sr.Close();
-
-
-                // Создаем список уникальных имен
-                List<string> result = new List<string>();
-                foreach (var rida in File.ReadAllLines(@"..\..\RecordTable.txt"))
-                {
-                    if (!string.IsNullOrEmpty(rida)) // Исключаем пустые строки
-                    {
-                        result.Add(rida);
-                    }
-
-                }
-                Console.SetCursorPosition(2, 1);
-                Console.WriteLine(" " + result.Last());
-            }
-            catch
-            {
-                Console.WriteLine("Tekkis viga.");
-            }
-
-
-
-
-
-            Console.SetWindowSize(80, 25);
-            Walls walls = new Walls(80, 25);
-            walls.Draw();
-
-            // Отрисовка точек   
-            Point p = new Point(4, 5, '*');
-            Snake snake = new Snake(p, 4, Direction.RIGHT);
-            snake.Draw();
-
-            FoodCreator foodCreator = new FoodCreator(80, 25, '$');
-            Point food = foodCreator.CreateFood();
-            food.Draw();
-
+            // Основной игровой цикл
             while (true)
             {
                 // Проверяем столкновение с границами или хвостом
@@ -82,6 +88,7 @@ namespace Snake2
                 {
                     Console.SetCursorPosition(35, 12);
                     Console.WriteLine("Game Over");
+                    gameTimer.Stop();
                     break;
                 }
 
@@ -93,25 +100,61 @@ namespace Snake2
                 }
                 else
                 {
-                    snake.Move(); // перемещение змейки
+                    snake.Move(); // Перемещение змейки
                 }
 
-                Thread.Sleep(100); // задержка между кадрами
+                Thread.Sleep(100); // Задержка между кадрами
 
                 // Управление с помощью клавиш
                 if (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo key = Console.ReadKey(true); // true, чтобы не выводить символ
-                    snake.HandleKey(key.Key); // изменение направления
+                    snake.HandleKey(key.Key); // Изменение направления
                 }
             }
+
+            // Получаем время игры
+            string elapsedTime = gameTimer.GetElapsedTime();
+
+            // Запись имени игрока и времени в файл
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(@"..\..\RecordTable.txt", true))
+                {
+                    sw.WriteLine($"{playerName} - {elapsedTime}"); // Записываем имя и время в файл
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Tekkis viga.");
+            }
+
+            // Чтение и отображение последнего имени игрока
+            try
+            {   
+                Console.Clear();
+                using (StreamReader sr = new StreamReader(@"..\..\RecordTable.txt"))
+                {
+                    string lines = sr.ReadToEnd();
+                    var result = lines.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    Console.SetCursorPosition(2, 1);
+                    Console.WriteLine("Viimane mängija: " + result.Last()); // Выводим последнее имя
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Tekkis viga.");
+            }
+
+            // Завершаем поток таймера
+            displayThread.Join();
             Console.ReadLine();
         }
-
-
     }
-
 }
+
+
+
 
 
 

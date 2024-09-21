@@ -6,42 +6,47 @@ using System.Threading; // Для задержки в основном пото�
 namespace Snake2
 {
     internal class Time
+
     {
-        public Stopwatch Stopwatch { get; private set; }
-        public string FileName { get; private set; }
+
+        private Stopwatch stopwatch;
+        private string fileName;
 
         public Time(string fileName)
         {
-            Stopwatch = new Stopwatch();
-            FileName = fileName;
+            stopwatch = new Stopwatch();
+            this.fileName = fileName;
         }
 
         public void Start()
         {
-            Stopwatch.Start();
+            stopwatch.Start();
         }
 
         public void Stop()
         {
-            Stopwatch.Stop();
+            stopwatch.Stop();
             WriteTimeToFile();
         }
 
         public void WriteTimeToFile()
         {
-            string elapsedTime = Stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
-            File.AppendAllText(FileName, $"Game Duration: {elapsedTime}\n");
+            string elapsedTime = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+            File.AppendAllText(fileName, $"Game Duration: {elapsedTime}\n");
         }
 
-        // Для вывода времени на экран каждую секунду
         public void DisplayTime()
         {
-            while (Stopwatch.IsRunning)
+            while (stopwatch.IsRunning)
             {
-                Console.Clear();
-                Console.WriteLine($"Прошло времени: {Stopwatch.Elapsed.ToString(@"hh\:mm\:ss")}");
+                Console.SetCursorPosition(2, 2); // Отображаем время в нужных координатах
+                Console.WriteLine($"Прошло времени: {stopwatch.Elapsed.ToString(@"hh\:mm\:ss")}");
                 Thread.Sleep(1000); // Задержка 1 секунда
             }
+        }
+        public string GetElapsedTime()
+        {
+            return stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
         }
     }
 }
