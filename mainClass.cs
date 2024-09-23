@@ -36,6 +36,19 @@ namespace Snake2
 
             switch (userInput)
             {
+                case "1":
+                    Console.Clear();
+                    Console.WriteLine("Sa valisid tase 1");
+                    walls = new Walls(100, 30); // Например, для уровня 1
+                    walls.Draw();
+                    Point p3 = new Point(4, 5, '*');
+                    snake = new Snake(p3, 4, Direction.RIGHT);
+                    snake.Draw();
+                    foodCreator = new FoodCreator(100, 30, '$');
+                    food = foodCreator.CreateFood();
+                    food.Draw();
+                    break;
+
                 case "2":
                     Console.Clear();
                     Console.WriteLine("Sa valisid tase 2");
@@ -62,23 +75,15 @@ namespace Snake2
                     food.Draw();
                     break;
 
-                case "1":
-                    Console.Clear();
-                    Console.WriteLine("Sa valisid tase 1");
-                    walls = new Walls(100, 30); // Например, для уровня 1
-                    walls.Draw();
-                    Point p3 = new Point(4, 5, '*');
-                    snake = new Snake(p3, 4, Direction.RIGHT);
-                    snake.Draw();
-                    foodCreator = new FoodCreator(100, 30, '$');
-                    food = foodCreator.CreateFood();
-                    food.Draw();
-                    break;
+                
 
                 default:
                     Console.WriteLine("Vale valik (Неправильный выбор). Proovi uuesti.");
                     return; // Выход, если выбор некорректный
             }
+
+
+            Score score = new Score(); // Создаем объект для подсчета очков
 
             // Основной игровой цикл
             while (true)
@@ -97,11 +102,14 @@ namespace Snake2
                 {
                     food = foodCreator.CreateFood();
                     food.Draw();
+                    score.AddPoints(); // Добавляем очки за съеденную еду
                 }
                 else
                 {
                     snake.Move(); // Перемещение змейки
                 }
+
+                score.DisplayScore(); // Постоянно обновляем отображение очков
 
                 Thread.Sleep(100); // Задержка между кадрами
 
@@ -121,7 +129,10 @@ namespace Snake2
             {
                 using (StreamWriter sw = new StreamWriter(@"..\..\RecordTable.txt", true))
                 {
-                    sw.WriteLine($"{playerName} - {elapsedTime}"); // Записываем имя и время в файл
+                    int finalScore = score.GetScore(); // Получаем финальный счет
+
+                    sw.WriteLine($"{playerName} - {elapsedTime}, {finalScore}"); // Время и результат
+                                                                                 // Записываем имя и время в файл
                 }
             }
             catch

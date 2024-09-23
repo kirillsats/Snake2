@@ -53,6 +53,7 @@
     <Compile Include="mainClass.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Score.cs" />
     <Compile Include="Snake.cs" />
     <Compile Include="Speed.cs" />
     <Compile Include="Time.cs" />

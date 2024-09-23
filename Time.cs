@@ -1,13 +1,32 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading; // Для задержки в основном потоке
+using System.Threading;
 
 namespace Snake2
 {
     internal class Time
-
     {
+        private bool isDisplayingTime = false;
+
+        public void DisplayTime()
+        {
+            if (isDisplayingTime) return;
+
+            isDisplayingTime = true;
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+
+            while (stopwatch.IsRunning)
+            {
+                Console.SetCursorPosition(0, 0);
+                Console.Write($"Teie aeg: {stopwatch.Elapsed.ToString(@"hh\:mm\:ss")}");
+                Thread.Sleep(1000);
+            }
+
+            isDisplayingTime = false;
+            
+        }
 
         private Stopwatch stopwatch;
         private string fileName;
@@ -35,15 +54,8 @@ namespace Snake2
             File.AppendAllText(fileName, $"Game Duration: {elapsedTime}\n");
         }
 
-        public void DisplayTime()
-        {
-            while (stopwatch.IsRunning)
-            {
-                Console.SetCursorPosition(2, 2); // Отображаем время в нужных координатах
-                Console.WriteLine($"Прошло времени: {stopwatch.Elapsed.ToString(@"hh\:mm\:ss")}");
-                Thread.Sleep(1000); // Задержка 1 секунда
-            }
-        }
+        
+
         public string GetElapsedTime()
         {
             return stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
